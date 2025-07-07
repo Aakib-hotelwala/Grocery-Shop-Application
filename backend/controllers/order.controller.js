@@ -184,6 +184,7 @@ export const deleteOrderController = async (req, res) => {
   }
 };
 
+// ================== Get Orders By Status ==================
 export const getOrdersByStatusController = async (req, res) => {
   try {
     const { status } = req.params;
