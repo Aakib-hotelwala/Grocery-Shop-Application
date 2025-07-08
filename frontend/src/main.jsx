@@ -10,6 +10,6 @@ createRoot(document.getElementById("root")).render(
   <ThemeProvider theme={lightTheme}>
     <CssBaseline />
     <App />
-    <ToastContainer />
+    <ToastContainer duration={1000} />
   </ThemeProvider>
 );

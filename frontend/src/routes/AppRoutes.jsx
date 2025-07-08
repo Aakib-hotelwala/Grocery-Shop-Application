@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import RoleRedirect from "../components/common/RoleRedirect";
-import ProtectedRoute from "../components/common/protectedRoute";
+import ProtectedRoute from "../components/common/ProtectedRoute";
 import AdminRoutes from "./AdminRoutes";
 import UserRoutes from "./UserRoutes";
 import NotFound from "../components/common/NotFound";
