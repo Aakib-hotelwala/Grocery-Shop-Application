@@ -9,7 +9,6 @@ const storage = new CloudinaryStorage({
     folder: "grocery-shop-application",
     resource_type: "image",
     public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
-    transformation: [{ quality: "auto" }, { fetch_format: "auto" }],
   }),
 });
 
