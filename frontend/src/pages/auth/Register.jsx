@@ -1,3 +1,4 @@
+// src/pages/auth/Register.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../../services/authService";
@@ -46,7 +47,6 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Normally you would send a FormData if uploading an image
     const payload = new FormData();
     payload.append("name", formData.name);
     payload.append("email", formData.email);
@@ -74,7 +74,7 @@ const Register = () => {
       justifyContent="center"
       sx={{
         px: 2,
-        background: "linear-gradient(to right, #e8f5e9, #f1f8e9)",
+        background: "linear-gradient(to right, #ffe0e0, #e0f7fa)",
       }}
     >
       <Container maxWidth="xs">
@@ -86,18 +86,18 @@ const Register = () => {
             style={{
               width: "100px",
               objectFit: "contain",
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
             }}
           />
         </Box>
 
         <Paper
-          elevation={4}
+          elevation={5}
           sx={{
             p: { xs: 3, sm: 4 },
             borderRadius: 3,
-            backgroundColor: "#ffffff",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            background: "linear-gradient(145deg, #ffffff, #e3f2fd)",
+            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.08)",
           }}
         >
           <Typography
@@ -115,7 +115,7 @@ const Register = () => {
             color="text.secondary"
             mb={3}
           >
-            Register to get started
+            Join and start shopping now
           </Typography>
 
           {/* Profile Image Upload */}
@@ -125,14 +125,7 @@ const Register = () => {
             justifyContent="center"
             mb={2}
           >
-            <Box
-              sx={{
-                position: "relative",
-                width: 90,
-                height: 90,
-              }}
-            >
-              {/* Profile Preview */}
+            <Box sx={{ position: "relative", width: 90, height: 90 }}>
               <label htmlFor="profile-upload">
                 {preview ? (
                   <img
@@ -144,18 +137,17 @@ const Register = () => {
                       objectFit: "cover",
                       borderRadius: "50%",
                       cursor: "pointer",
+                      border: "2px solid #4caf50",
                     }}
                   />
                 ) : (
                   <FaUserCircle
                     size={90}
-                    color="#9e9e9e"
+                    color="#ccc"
                     style={{ cursor: "pointer" }}
                   />
                 )}
               </label>
-
-              {/* Camera Icon Button (also inside label) */}
               <label htmlFor="profile-upload">
                 <IconButton
                   component="span"
@@ -163,22 +155,20 @@ const Register = () => {
                     position: "absolute",
                     bottom: 4,
                     right: 4,
-                    bgcolor: "#e0f2f1",
+                    bgcolor: "#e1bee7",
+                    color: "#6a1b9a",
                     p: 0.5,
                     border: "1px solid #ccc",
                     boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
-                    zIndex: 1,
                     ":hover": {
-                      bgcolor: "#b2dfdb",
+                      bgcolor: "#ce93d8",
                     },
                   }}
                   size="small"
                 >
-                  <FiCamera size={16} color="#00796B" />
+                  <FiCamera size={16} />
                 </IconButton>
               </label>
-
-              {/* File Input (hidden) */}
               <input
                 type="file"
                 accept="image/*"
@@ -220,7 +210,6 @@ const Register = () => {
               margin="normal"
               required
             />
-
             <TextField
               fullWidth
               label="Phone Number"
@@ -233,7 +222,6 @@ const Register = () => {
             <Box mt={3}>
               <Button
                 variant="contained"
-                color="primary"
                 type="submit"
                 fullWidth
                 disabled={loading}
@@ -242,6 +230,10 @@ const Register = () => {
                   borderRadius: 2,
                   fontWeight: 600,
                   fontSize: "1.1rem",
+                  backgroundColor: "#4caf50",
+                  ":hover": {
+                    backgroundColor: "#388e3c",
+                  },
                   color: "#fff",
                 }}
               >

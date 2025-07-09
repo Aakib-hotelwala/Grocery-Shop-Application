@@ -1,3 +1,4 @@
+// src/pages/auth/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../services/authService";
@@ -44,7 +45,7 @@ const Login = () => {
       justifyContent="center"
       sx={{
         px: 2,
-        background: "linear-gradient(to right, #e8f5e9, #f1f8e9)",
+        background: "linear-gradient(to right, #e1f5fe, #fce4ec)",
       }}
     >
       <Container maxWidth="xs">
@@ -55,21 +56,20 @@ const Login = () => {
             alt="Grocery Shop Logo"
             style={{
               width: "100px",
-              maxWidth: "100%",
               objectFit: "contain",
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.15))",
             }}
           />
         </Box>
 
         {/* Login Card */}
         <Paper
-          elevation={4}
+          elevation={6}
           sx={{
             p: { xs: 3, sm: 4 },
             borderRadius: 3,
-            backgroundColor: "#ffffff",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            background: "linear-gradient(135deg, #ffffff, #f3e5f5)",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
           }}
         >
           <Typography
@@ -93,7 +93,7 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Email or PhoneNo"
+              label="Email or Phone Number"
               name="identifier"
               value={formData.identifier}
               onChange={handleChange}
@@ -114,7 +114,6 @@ const Login = () => {
             <Box mt={3}>
               <Button
                 variant="contained"
-                color="primary"
                 type="submit"
                 fullWidth
                 disabled={loading}
@@ -123,6 +122,10 @@ const Login = () => {
                   borderRadius: 2,
                   fontWeight: 600,
                   fontSize: "1.1rem",
+                  backgroundColor: "#4caf50",
+                  ":hover": {
+                    backgroundColor: "#388e3c",
+                  },
                   color: "#fff",
                 }}
               >

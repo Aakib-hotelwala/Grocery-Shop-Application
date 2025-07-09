@@ -13,12 +13,15 @@ import CategoryEdit from "../pages/admin/categories/CategoryEdit";
 import OrderList from "../pages/admin/orders/OrderList";
 import OrderDetail from "../pages/admin/orders/OrderDetail";
 import AnalyticsDashboard from "../pages/admin/analytics/AnalyticsDashboard";
+import AdminProfile from "../pages/admin/profile/AdminProfile";
 
 const AdminRoutes = () => {
   return (
     <Routes>
       <Route element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardHome />} />
+
+        <Route path="profile" element={<AdminProfile />} />
 
         {/* Users */}
         <Route path="users" element={<UserList />} />

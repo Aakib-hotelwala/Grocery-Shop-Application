@@ -5,7 +5,8 @@ import Home from "../pages/user/Home";
 import ProductList from "../pages/user/ProductList";
 import Cart from "../pages/user/Cart";
 import Orders from "../pages/user/Orders";
-import Profile from "../pages/user/Profile";
+import Profile from "../pages/user/UserProfile";
+import UserProfile from "../pages/user/UserProfile";
 
 const UserRoutes = () => {
   return (
@@ -15,7 +16,7 @@ const UserRoutes = () => {
         <Route path="products" element={<ProductList />} />
         <Route path="cart" element={<Cart />} />
         <Route path="orders" element={<Orders />} />
-        <Route path="profile" element={<Profile />} />
+        <Route path="profile" element={<UserProfile />} />
       </Route>
     </Routes>
   );
