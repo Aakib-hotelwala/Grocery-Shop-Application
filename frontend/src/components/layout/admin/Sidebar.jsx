@@ -6,6 +6,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  useTheme,
 } from "@mui/material";
 import {
   Dashboard,
@@ -27,6 +28,8 @@ const navItems = [
 ];
 
 const Sidebar = ({ mobileOpen, onClose, isMobile }) => {
+  const theme = useTheme();
+
   return (
     <Drawer
       variant={isMobile ? "temporary" : "permanent"}
@@ -42,7 +45,9 @@ const Sidebar = ({ mobileOpen, onClose, isMobile }) => {
         "& .MuiDrawer-paper": {
           width: 220,
           boxSizing: "border-box",
-          backgroundColor: "#f5f5f5",
+          backgroundColor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          borderRight: `1px solid ${theme.palette.divider}`,
         },
       }}
     >
@@ -56,13 +61,18 @@ const Sidebar = ({ mobileOpen, onClose, isMobile }) => {
                 onClick={isMobile ? onClose : undefined}
                 sx={{
                   "&.active": {
-                    backgroundColor: "#e0f2f1",
+                    backgroundColor: theme.palette.action.selected,
                     fontWeight: "bold",
-                    color: "primary.main",
+                    color: theme.palette.primary.main,
+                    "& .MuiListItemIcon-root": {
+                      color: theme.palette.primary.main,
+                    },
                   },
                 }}
               >
-                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ color: "inherit" }}>
+                  {item.icon}
+                </ListItemIcon>
                 <ListItemText primary={item.label} />
               </ListItemButton>
             </ListItem>

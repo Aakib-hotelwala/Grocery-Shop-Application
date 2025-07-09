@@ -5,18 +5,33 @@ const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#4CAF50", // Green
+      main: "#43a047", // Fresh leafy green
     },
     secondary: {
-      main: "#FBC02D", // Yellow
+      main: "#ffb74d", // Soft orange for accents
+    },
+    tertiary: {
+      main: "#ffee58", // Yellow (not used by MUI by default but useful via sx)
     },
     background: {
-      default: "#f9f9f9",
-      paper: "#ffffff",
+      default: "#fdf6ec", // Warm creamy tone
+      paper: "#ffffff", // Card background
     },
     text: {
-      primary: "#1f2937", // Dark gray
-      secondary: "#6b7280", // Light gray
+      primary: "#263238", // Rich gray-blue
+      secondary: "#546e7a", // Muted slate
+    },
+    info: {
+      main: "#a7ffeb", // Aqua green
+    },
+    success: {
+      main: "#66bb6a",
+    },
+    warning: {
+      main: "#fbc02d",
+    },
+    error: {
+      main: "#e57373",
     },
   },
   typography: {
@@ -26,7 +41,24 @@ const lightTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          background: "linear-gradient(135deg, #ffffff, #fff8e1)",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.07)",
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: "linear-gradient(to right, #e3ffe7, #fffde7)", // Soft green-yellow blend
+        },
+      },
+    },
   },
 });
 

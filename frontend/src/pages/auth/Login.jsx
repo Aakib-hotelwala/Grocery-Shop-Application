@@ -1,4 +1,3 @@
-// src/pages/auth/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../services/authService";
@@ -9,10 +8,14 @@ import {
   TextField,
   Typography,
   Paper,
+  useTheme,
 } from "@mui/material";
 import ClipLoader from "react-spinners/ClipLoader";
 
 const Login = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -45,7 +48,9 @@ const Login = () => {
       justifyContent="center"
       sx={{
         px: 2,
-        background: "linear-gradient(to right, #e1f5fe, #fce4ec)",
+        background: isDark
+          ? "linear-gradient(to right, #1e1f23, #2a2d33)"
+          : "linear-gradient(to right, #e3ffe7, #fffde7)", // From your theme
       }}
     >
       <Container maxWidth="xs">
@@ -68,8 +73,12 @@ const Login = () => {
           sx={{
             p: { xs: 3, sm: 4 },
             borderRadius: 3,
-            background: "linear-gradient(135deg, #ffffff, #f3e5f5)",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+            background: isDark
+              ? "linear-gradient(145deg, #23272f, #2c303a)"
+              : "linear-gradient(135deg, #ffffff, #fff8e1)",
+            boxShadow: isDark
+              ? "0 10px 30px rgba(0, 0, 0, 0.5)"
+              : "0 10px 30px rgba(0,0,0,0.1)",
           }}
         >
           <Typography
@@ -122,9 +131,9 @@ const Login = () => {
                   borderRadius: 2,
                   fontWeight: 600,
                   fontSize: "1.1rem",
-                  backgroundColor: "#4caf50",
+                  backgroundColor: theme.palette.primary.main,
                   ":hover": {
-                    backgroundColor: "#388e3c",
+                    backgroundColor: theme.palette.primary.dark,
                   },
                   color: "#fff",
                 }}
@@ -138,11 +147,11 @@ const Login = () => {
         {/* Register Link */}
         <Box mt={3} textAlign="center">
           <Typography variant="body2" color="text.secondary">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               to="/register"
               style={{
-                color: "#4CAF50",
+                color: theme.palette.primary.main,
                 fontWeight: 500,
                 textDecoration: "none",
               }}

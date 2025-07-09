@@ -9,10 +9,12 @@ import {
   Stack,
 } from "@mui/material";
 import useAuthStore from "../../../store/authStore";
+import { useTheme } from "@mui/material/styles";
 import { format } from "date-fns";
 
 const AdminProfile = () => {
   const user = useAuthStore((state) => state.user);
+  const theme = useTheme();
 
   return (
     <Box
@@ -29,7 +31,7 @@ const AdminProfile = () => {
           width: "100%",
           maxWidth: 700,
           borderRadius: 3,
-          bgcolor: "#ffffff",
+          bgcolor: theme.palette.background.paper,
         }}
       >
         {/* Profile Header */}

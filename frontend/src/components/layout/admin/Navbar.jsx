@@ -11,17 +11,24 @@ import {
   ListItemText,
   Divider,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../../store/authStore";
 import { FaUserCircle } from "react-icons/fa";
+import { FiMoon, FiSun } from "react-icons/fi";
+import useThemeStore from "../../../store/themeStore";
 
 const Navbar = ({ onMenuClick, showMenu }) => {
+  const theme = useTheme();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+
+  const mode = useThemeStore((state) => state.mode);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -30,7 +37,8 @@ const Navbar = ({ onMenuClick, showMenu }) => {
 
   const handleLogout = () => {
     logout();
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 
@@ -42,9 +50,9 @@ const Navbar = ({ onMenuClick, showMenu }) => {
         position="static"
         elevation={1}
         sx={{
-          bgcolor: "#ffffff",
-          color: "#00796B",
-          borderBottom: "1px solid #e0e0e0",
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.primary.main,
+          borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
         <Toolbar
@@ -79,25 +87,22 @@ const Navbar = ({ onMenuClick, showMenu }) => {
           <IconButton onClick={toggleDrawer(true)} sx={{ p: 0 }}>
             <Box
               sx={{
-                width: avatarSize + 4, // Slightly larger
+                width: avatarSize + 4,
                 height: avatarSize + 4,
                 borderRadius: "50%",
                 overflow: "hidden",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                bgcolor: "#00796B",
-                minWidth: avatarSize + 4, // Prevent shrinking in flexbox
+                bgcolor: theme.palette.primary.main,
+                minWidth: avatarSize + 4,
               }}
             >
               {user?.profileImageUrl ? (
                 <Avatar
                   src={user.profileImageUrl}
                   alt={user?.name || "Admin"}
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                  }}
+                  sx={{ width: "100%", height: "100%" }}
                   imgProps={{
                     loading: "lazy",
                     style: { objectFit: "cover" },
@@ -128,7 +133,7 @@ const Navbar = ({ onMenuClick, showMenu }) => {
             display: "flex",
             flexDirection: "column",
             height: "100%",
-            bgcolor: "#f9f9f9",
+            bgcolor: theme.palette.background.paper,
           }}
         >
           {/* Profile Section */}
@@ -143,13 +148,12 @@ const Navbar = ({ onMenuClick, showMenu }) => {
               <FaUserCircle
                 size={64}
                 style={{
-                  color: "#888",
+                  color: theme.palette.text.secondary,
                   margin: "0 auto",
                   display: "block",
                 }}
               />
             )}
-
             <Typography variant="h6" mt={1}>
               {user?.name || "Admin"}
             </Typography>
@@ -166,10 +170,23 @@ const Navbar = ({ onMenuClick, showMenu }) => {
 
           {/* Drawer Links */}
           <List>
-            <ListItem button onClick={() => navigate("/admin/profile")}>
+            <ListItem
+              button
+              onClick={() => navigate("/admin/profile")}
+              sx={{ cursor: "pointer" }}
+            >
               <ListItemText primary="Profile" />
             </ListItem>
-            <ListItem button onClick={handleLogout}>
+
+            {/* 🌗 Theme Toggle */}
+            <ListItem button onClick={toggleTheme} sx={{ cursor: "pointer" }}>
+              <ListItemText
+                primary={mode === "light" ? "Dark Mode" : "Light Mode"}
+              />
+              {mode === "light" ? <FiMoon size={20} /> : <FiSun size={20} />}
+            </ListItem>
+
+            <ListItem button onClick={handleLogout} sx={{ cursor: "pointer" }}>
               <ListItemText primary="Logout" />
             </ListItem>
           </List>

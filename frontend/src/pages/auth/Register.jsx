@@ -11,11 +11,15 @@ import {
   Paper,
   IconButton,
 } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { FaUserCircle } from "react-icons/fa";
 import { FiCamera } from "react-icons/fi";
 import ClipLoader from "react-spinners/ClipLoader";
 
 const Register = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -74,7 +78,9 @@ const Register = () => {
       justifyContent="center"
       sx={{
         px: 2,
-        background: "linear-gradient(to right, #ffe0e0, #e0f7fa)",
+        background: isDark
+          ? "linear-gradient(to right, #1e1f23, #2a2d33)"
+          : "linear-gradient(to right, #e3ffe7, #fffde7)",
       }}
     >
       <Container maxWidth="xs">
@@ -96,8 +102,12 @@ const Register = () => {
           sx={{
             p: { xs: 3, sm: 4 },
             borderRadius: 3,
-            background: "linear-gradient(145deg, #ffffff, #e3f2fd)",
-            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.08)",
+            background: isDark
+              ? "linear-gradient(145deg, #23272f, #2c303a)"
+              : "linear-gradient(135deg, #ffffff, #fff8e1)",
+            boxShadow: isDark
+              ? "0 10px 30px rgba(0, 0, 0, 0.5)"
+              : "0 10px 25px rgba(0, 0, 0, 0.08)",
           }}
         >
           <Typography
@@ -230,9 +240,9 @@ const Register = () => {
                   borderRadius: 2,
                   fontWeight: 600,
                   fontSize: "1.1rem",
-                  backgroundColor: "#4caf50",
+                  backgroundColor: theme.palette.primary.main,
                   ":hover": {
-                    backgroundColor: "#388e3c",
+                    backgroundColor: theme.palette.primary.dark,
                   },
                   color: "#fff",
                 }}
@@ -249,7 +259,7 @@ const Register = () => {
             <Link
               to="/login"
               style={{
-                color: "#4CAF50",
+                color: theme.palette.primary.main,
                 fontWeight: 500,
                 textDecoration: "none",
               }}

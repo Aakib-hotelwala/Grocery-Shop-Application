@@ -5,18 +5,30 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#66bb6a", // Softer green
+      main: "#81c784", // Warm soft green
     },
     secondary: {
-      main: "#FBC02D", // Yellow
+      main: "#ffcc80", // Soft orange
     },
     background: {
-      default: "#121212",
-      paper: "#1E1E1E",
+      default: "#181a1f", // Slightly warm black
+      paper: "#23272f", // For cards and panels
+    },
+    info: {
+      main: "#80deea", // Aqua for accents
+    },
+    success: {
+      main: "#aed581",
+    },
+    warning: {
+      main: "#fbc02d",
+    },
+    error: {
+      main: "#ef9a9a",
     },
     text: {
-      primary: "#ffffff",
-      secondary: "#cfcfcf",
+      primary: "#e0f2f1", // Soft teal-white
+      secondary: "#b0bec5", // Soft bluish-gray
     },
   },
   typography: {
@@ -26,7 +38,24 @@ const darkTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          background: "linear-gradient(145deg, #23272f, #2c303a)",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: "linear-gradient(to right, #1e1f23, #2a2d33)", // Dark gradient
+        },
+      },
+    },
   },
 });
 
