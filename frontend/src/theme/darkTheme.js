@@ -49,6 +49,12 @@ const darkTheme = createTheme({
         },
       },
     },
+    custom: {
+      gradient: "linear-gradient(to right, #1e1f23, #2a2d33)",
+      cardGradient: "linear-gradient(145deg, #23272f, #2c303a)",
+      cardShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
+    },
+
     MuiCssBaseline: {
       styleOverrides: {
         body: {

@@ -14,8 +14,6 @@ import ClipLoader from "react-spinners/ClipLoader";
 
 const Login = () => {
   const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
-
   const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -48,9 +46,7 @@ const Login = () => {
       justifyContent="center"
       sx={{
         px: 2,
-        background: isDark
-          ? "linear-gradient(to right, #1e1f23, #2a2d33)"
-          : "linear-gradient(to right, #e3ffe7, #fffde7)", // From your theme
+        background: theme.custom?.gradient || theme.palette.background.default,
       }}
     >
       <Container maxWidth="xs">
@@ -73,12 +69,9 @@ const Login = () => {
           sx={{
             p: { xs: 3, sm: 4 },
             borderRadius: 3,
-            background: isDark
-              ? "linear-gradient(145deg, #23272f, #2c303a)"
-              : "linear-gradient(135deg, #ffffff, #fff8e1)",
-            boxShadow: isDark
-              ? "0 10px 30px rgba(0, 0, 0, 0.5)"
-              : "0 10px 30px rgba(0,0,0,0.1)",
+            background:
+              theme.custom?.cardGradient || theme.palette.background.paper,
+            boxShadow: theme.custom?.cardShadow || theme.shadows[8],
           }}
         >
           <Typography

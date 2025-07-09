@@ -52,6 +52,11 @@ const lightTheme = createTheme({
         },
       },
     },
+    custom: {
+      gradient: "linear-gradient(to right, #e3ffe7, #fffde7)",
+      cardGradient: "linear-gradient(135deg, #ffffff, #fff8e1)",
+      cardShadow: "0 10px 30px rgba(0,0,0,0.1)",
+    },
     MuiCssBaseline: {
       styleOverrides: {
         body: {
