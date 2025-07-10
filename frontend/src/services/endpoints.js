@@ -26,4 +26,6 @@ export const post = (url, data) => handleRequest(instance.post(url, data));
 
 export const put = (url, data) => handleRequest(instance.put(url, data));
 
+export const patch = (url, data) => handleRequest(instance.patch(url, data));
+
 export const del = (url) => handleRequest(instance.delete(url));

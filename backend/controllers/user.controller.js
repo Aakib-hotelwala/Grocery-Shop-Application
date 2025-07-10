@@ -122,7 +122,6 @@ export const LoginController = async (req, res) => {
   }
 };
 
-
 // ================= Logout =================
 export const LogoutController = (req, res) => {
   try {
@@ -251,10 +250,30 @@ export const UpdateProfileController = async (req, res) => {
   }
 };
 
-// ================= Get All Users =================
+// ================= Get All Users (with search & role filter) =================
 export const getAllUsersController = async (req, res) => {
   try {
-    const users = await UserModel.find().select("-passwordHash").lean();
+    const { search = "", role } = req.query;
+
+    // Search conditions
+    const query = {
+      $and: [
+        {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+            { phoneNo: { $regex: search, $options: "i" } },
+          ],
+        },
+      ],
+    };
+
+    // If role filter is passed (admin or user)
+    if (role && ["admin", "user"].includes(role)) {
+      query.$and.push({ role });
+    }
+
+    const users = await UserModel.find(query).select("-passwordHash").lean();
 
     return res.status(200).json({
       success: true,
