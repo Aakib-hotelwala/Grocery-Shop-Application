@@ -186,7 +186,7 @@ const UserList = () => {
                           </Box>
                         </Box>
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>++
+                      <TableCell>{user.email}</TableCell>
                       <TableCell>{user.phoneNo}</TableCell>
                       <TableCell>
                         <Chip

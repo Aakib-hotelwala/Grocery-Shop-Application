@@ -14,9 +14,18 @@ const DashboardHome = () => {
         Admin Dashboard
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} columns={{ xs: 12, sm: 12, md: 12 }}>
         {stats.map((item) => (
-          <Grid item xs={12} sm={6} md={3} key={item.label}>
+          <Grid
+            key={item.label}
+            sx={{
+              gridColumn: {
+                xs: "span 12",
+                sm: "span 6",
+                md: "span 3",
+              },
+            }}
+          >
             <Paper
               elevation={4}
               sx={{
