@@ -125,15 +125,10 @@ export const deleteCategoryController = async (req, res) => {
   }
 };
 
-// ================== Get All Categories ==================
+// ================== Get All Categories (No Pagination) ==================
 export const getAllCategoriesController = async (req, res) => {
   try {
-    const {
-      keyword = "",
-      isActive = true, // by default only active categories
-      page = 1,
-      limit = 10,
-    } = req.query;
+    const { keyword = "", isActive = "true" } = req.query;
 
     const filters = {};
 
@@ -142,40 +137,31 @@ export const getAllCategoriesController = async (req, res) => {
       filters.name = { $regex: keyword, $options: "i" };
     }
 
-    // isActive filter (string to boolean)
+    // isActive filter
     if (isActive !== "all") {
       filters.isActive = isActive === "true";
     }
 
-    // Step 1: Fetch paginated main categories (parentCategoryId == null)
-    const skip = (Number(page) - 1) * Number(limit);
+    // Fetch all main categories
+    const mainCategories = await Category.find({
+      ...filters,
+      parentCategoryId: null,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
-    const [mainCategories, total] = await Promise.all([
-      Category.find({
-        ...filters,
-        parentCategoryId: null,
-      })
-        .skip(skip)
-        .limit(Number(limit))
-        .sort({ createdAt: -1 })
-        .lean(),
-
-      Category.countDocuments({
-        ...filters,
-        parentCategoryId: null,
-      }),
-    ]);
-
-    // Step 2: Get all subcategories that match `isActive`
+    // Fetch all subcategories (based on isActive)
     const subFilters = {};
-    if (isActive !== "all") subFilters.isActive = isActive === "true";
+    if (isActive !== "all") {
+      subFilters.isActive = isActive === "true";
+    }
 
     const subcategories = await Category.find({
       parentCategoryId: { $ne: null },
       ...subFilters,
     }).lean();
 
-    // Step 3: Group subcategories under parents
+    // Group subcategories under their parents
     const categoryMap = {};
     for (const mainCat of mainCategories) {
       categoryMap[mainCat._id.toString()] = {
@@ -196,9 +182,6 @@ export const getAllCategoriesController = async (req, res) => {
     return res.status(200).json({
       success: true,
       categories: formatted,
-      total,
-      page: Number(page),
-      totalPages: Math.ceil(total / Number(limit)),
     });
   } catch (error) {
     console.error("Get All Categories Error:", error);
