@@ -1,4 +1,6 @@
 import axios from "axios";
+import useAuthStore from "../store/authStore";
+import { refreshToken } from "./authService";
 
 // export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -8,6 +10,42 @@ const instance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
+
+// 🔁 Add Authorization header to every request
+instance.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// 🔁 Refresh access token on 401 Unauthorized
+instance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        await refreshToken(); // 👈 this updates Zustand store
+        const newToken = useAuthStore.getState().token;
+        if (newToken) {
+          originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+        }
+        return instance(originalRequest); // 🔁 Retry original request
+      } catch (refreshErr) {
+        useAuthStore.getState().logout(); // Clear tokens if refresh fails
+        window.location.href = "/login";
+        return Promise.reject(refreshErr);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 const handleRequest = async (request) => {
   try {

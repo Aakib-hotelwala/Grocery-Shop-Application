@@ -186,11 +186,8 @@ const UserList = () => {
                           </Box>
                         </Box>
                       </TableCell>
-
-                      <TableCell>{user.email}</TableCell>
-
+                      <TableCell>{user.email}</TableCell>++
                       <TableCell>{user.phoneNo}</TableCell>
-
                       <TableCell>
                         <Chip
                           label={user.role}
@@ -213,7 +210,6 @@ const UserList = () => {
                           }
                         />
                       </TableCell>
-
                       <TableCell align="center">
                         <Switch
                           checked={user.isActive}
