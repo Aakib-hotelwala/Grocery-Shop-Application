@@ -18,6 +18,10 @@ import {
   CircularProgress,
   Stack,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { get, patch, del } from "../../../services/endpoints";
@@ -44,6 +48,8 @@ const CategoryList = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const fetchCategories = async (keyword = "") => {
     setLoading(true);
@@ -51,7 +57,17 @@ const CategoryList = () => {
       const params = {};
       if (keyword) params.keyword = keyword;
       const data = await get(API_ROUTES.GET_ALL_CATEGORIES, params);
-      setCategories(data?.categories || []);
+
+      // Flatten main categories and subcategories into one list
+      const flat = [];
+      data?.categories?.forEach((main) => {
+        flat.push({ ...main, parent: null }); // main category
+        main.subcategories?.forEach((sub) => {
+          flat.push({ ...sub, parent: main }); // subcategory with reference to parent
+        });
+      });
+
+      setCategories(flat);
     } catch (err) {
       console.error("Failed to fetch categories", err);
     } finally {
@@ -72,14 +88,22 @@ const CategoryList = () => {
     }
   };
 
-  const handleDeleteCategory = async (id) => {
-    if (window.confirm("Are you sure you want to delete this category?")) {
-      try {
-        await del(API_ROUTES.DELETE_CATEGORY(id));
-        setCategories((prev) => prev.filter((cat) => cat._id !== id));
-      } catch (err) {
-        console.error("Failed to delete category", err);
-      }
+  const handleDeleteCategory = (id) => {
+    setCategoryToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await del(API_ROUTES.DELETE_CATEGORY(categoryToDelete));
+      setCategories((prev) =>
+        prev.filter((cat) => cat._id !== categoryToDelete)
+      );
+    } catch (err) {
+      console.error("Failed to delete category", err);
+    } finally {
+      setDeleteDialogOpen(false);
+      setCategoryToDelete(null);
     }
   };
 
@@ -140,7 +164,7 @@ const CategoryList = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Category</TableCell>
-                    <TableCell>Subcategories</TableCell>
+                    <TableCell>Parent Category</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell align="center">Actions</TableCell>
                   </TableRow>
@@ -160,18 +184,13 @@ const CategoryList = () => {
                       </TableCell>
 
                       <TableCell>
-                        {cat.subcategories?.length > 0 ? (
-                          <Stack direction="row" spacing={1} flexWrap="wrap">
-                            {cat.subcategories.map((sub) => (
-                              <Chip
-                                key={sub._id}
-                                label={sub.name}
-                                size="small"
-                                color="secondary"
-                                variant="outlined"
-                              />
-                            ))}
-                          </Stack>
+                        {cat.parent ? (
+                          <Chip
+                            label={cat.parent.name}
+                            size="small"
+                            color="secondary"
+                            variant="outlined"
+                          />
                         ) : (
                           "-"
                         )}
@@ -215,6 +234,33 @@ const CategoryList = () => {
           </Box>
         </GradientPaper>
       )}
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this category?
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            color="secondary"
+            sx={{ color: "#fff" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            sx={{ color: "#fff" }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
