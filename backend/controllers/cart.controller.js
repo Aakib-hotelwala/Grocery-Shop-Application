@@ -8,7 +8,7 @@ export const getCartController = async (req, res) => {
 
     const cart = await Cart.findOne({ userId }).populate(
       "products.productId",
-      "name price quantityInGrams images"
+      "name price images"
     );
 
     if (!cart) {
@@ -50,10 +50,8 @@ export const addToCartController = async (req, res) => {
     }
 
     const pricePerUnit = product.price;
-    const quantityInGrams = product.quantityInGrams;
+    const purchasePrice = product.purchasePrice;
     const subtotal = pricePerUnit * quantity;
-    const profitPerUnit = product.price - product.purchasePrice;
-    const profit = profitPerUnit * quantity;
 
     let cart = await Cart.findOne({ userId });
 
@@ -66,10 +64,9 @@ export const addToCartController = async (req, res) => {
             productId,
             name: product.name,
             quantity,
-            quantityInGrams,
             pricePerUnit,
+            purchasePrice,
             subtotal,
-            profit,
           },
         ],
       });
@@ -79,20 +76,18 @@ export const addToCartController = async (req, res) => {
       );
 
       if (existingProductIndex !== -1) {
-        // 🔁 Update quantity and totals
+        // 🔁 Update quantity and subtotal
         cart.products[existingProductIndex].quantity += quantity;
         cart.products[existingProductIndex].subtotal += subtotal;
-        cart.products[existingProductIndex].profit += profit;
       } else {
         // ➕ Add new product
         cart.products.push({
           productId,
           name: product.name,
           quantity,
-          quantityInGrams,
           pricePerUnit,
+          purchasePrice,
           subtotal,
-          profit,
         });
       }
     }
@@ -139,7 +134,7 @@ export const updateCartItemController = async (req, res) => {
     }
 
     if (quantity === 0) {
-      // ❌ Remove product
+      // ❌ Remove product from cart
       cart.products.splice(productIndex, 1);
     } else {
       const dbProduct = await Product.findById(productId);
@@ -150,15 +145,13 @@ export const updateCartItemController = async (req, res) => {
       }
 
       const pricePerUnit = dbProduct.price;
-      const profitPerUnit = dbProduct.price - dbProduct.purchasePrice;
-      const quantityInGrams = dbProduct.quantityInGrams;
+      const purchasePrice = dbProduct.purchasePrice;
 
       // ✅ Update values
       cart.products[productIndex].quantity = quantity;
-      cart.products[productIndex].subtotal = pricePerUnit * quantity;
-      cart.products[productIndex].profit = profitPerUnit * quantity;
       cart.products[productIndex].pricePerUnit = pricePerUnit;
-      cart.products[productIndex].quantityInGrams = quantityInGrams;
+      cart.products[productIndex].purchasePrice = purchasePrice;
+      cart.products[productIndex].subtotal = pricePerUnit * quantity;
     }
 
     await cart.save();
@@ -183,27 +176,32 @@ export const removeCartItemController = async (req, res) => {
     const { productId } = req.body;
 
     if (!productId) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Product ID is required" });
+      return res.status(400).json({
+        error: true,
+        message: "Product ID is required",
+      });
     }
 
     const cart = await Cart.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json({ error: true, message: "Cart not found" });
+    if (!cart || cart.products.length === 0) {
+      return res.status(404).json({
+        error: true,
+        message: "Cart is empty or not found",
+      });
     }
 
-    const productIndex = cart.products.findIndex((p) =>
-      p.productId.equals(productId)
+    const initialLength = cart.products.length;
+    cart.products = cart.products.filter(
+      (item) => !item.productId.equals(productId)
     );
 
-    if (productIndex === -1) {
-      return res
-        .status(404)
-        .json({ error: true, message: "Product not in cart" });
+    if (cart.products.length === initialLength) {
+      return res.status(404).json({
+        error: true,
+        message: "Product not in cart",
+      });
     }
 
-    cart.products.splice(productIndex, 1);
     await cart.save();
 
     return res.status(200).json({
@@ -213,9 +211,10 @@ export const removeCartItemController = async (req, res) => {
     });
   } catch (error) {
     console.error("Remove Cart Item Error:", error.message);
-    return res
-      .status(500)
-      .json({ error: true, message: "Internal Server Error" });
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+    });
   }
 };
 
@@ -225,8 +224,11 @@ export const clearCartController = async (req, res) => {
     const userId = req.user._id;
 
     const cart = await Cart.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json({ error: true, message: "Cart not found" });
+    if (!cart || cart.products.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "Cart is already empty",
+      });
     }
 
     cart.products = [];
@@ -235,6 +237,7 @@ export const clearCartController = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Cart cleared successfully",
+      cart,
     });
   } catch (error) {
     console.error("Clear Cart Error:", error.message);
@@ -268,11 +271,10 @@ export const validateStockBeforeCheckoutController = async (req, res) => {
         continue;
       }
 
-      const totalQuantityGrams = item.quantity * item.quantityInGrams;
-      if (product.stockInGrams < totalQuantityGrams) {
+      if (product.stock < item.quantity) {
         errors.push({
           productId: item.productId,
-          reason: `Insufficient stock. Available: ${product.stockInGrams}g, Required: ${totalQuantityGrams}g`,
+          reason: `Insufficient stock. Available: ${product.stock}, Required: ${item.quantity}`,
         });
       }
     }

@@ -10,8 +10,6 @@ import {
   getSingleProductController,
   getAllProductsController,
   getProductsByCategoryController,
-  getBulkStockController,
-  getVariantsByBulkProductController,
 } from "../controllers/product.controller.js";
 
 const router = express.Router();
@@ -19,8 +17,6 @@ const router = express.Router();
 // ==================== Public Routes ====================
 router.get("/", getAllProductsController);
 router.get("/:id", getSingleProductController);
-router.get("/bulk/stock", getBulkStockController);
-router.get("/bulk/:bulkId/variants", getVariantsByBulkProductController);
 router.get("/category/:categoryId", getProductsByCategoryController);
 
 // ==================== Admin Routes (protected) ====================

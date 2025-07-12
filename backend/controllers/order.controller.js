@@ -14,8 +14,6 @@ export const placeOrderController = async (req, res) => {
 
     let totalAmount = 0;
     let totalProfit = 0;
-
-    // Stock check + build final orderProducts
     const orderProducts = [];
 
     for (const item of cart.products) {
@@ -26,22 +24,29 @@ export const placeOrderController = async (req, res) => {
           .json({ error: true, message: `Product ${item.name} not available` });
       }
 
-      const requiredStock = item.quantity * item.quantityInGrams;
-      if (product.stockInGrams < requiredStock) {
+      if (product.stock < item.quantity) {
         return res.status(400).json({
           error: true,
-          message: `Insufficient stock for ${item.name}. Available: ${product.stockInGrams}g, Required: ${requiredStock}g`,
+          message: `Insufficient stock for ${item.name}. Available: ${product.stock}, Required: ${item.quantity}`,
         });
       }
 
-      // Deduct stock
-      product.stockInGrams -= requiredStock;
+      const profit = (product.price - product.purchasePrice) * item.quantity;
+      totalProfit += profit;
+
+      // Deduct stock (unit-based)
+      product.stock -= item.quantity;
       await product.save();
 
       totalAmount += item.subtotal;
-      totalProfit += item.profit;
 
-      orderProducts.push(item);
+      orderProducts.push({
+        productId: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        pricePerUnit: item.pricePerUnit,
+        subtotal: item.subtotal,
+      });
     }
 
     const order = new Order({

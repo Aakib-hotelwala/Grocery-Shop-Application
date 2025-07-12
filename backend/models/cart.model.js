@@ -7,7 +7,6 @@ const cartSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     products: [
       {
         productId: {
@@ -17,10 +16,9 @@ const cartSchema = new mongoose.Schema(
         },
         name: String,
         quantity: { type: Number, default: 1 },
-        quantityInGrams: Number,
         pricePerUnit: Number,
+        purchasePrice: Number,
         subtotal: Number,
-        profit: Number,
       },
     ],
   },

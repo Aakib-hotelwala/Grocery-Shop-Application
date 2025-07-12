@@ -5,33 +5,15 @@ import cloudinary from "../config/cloudinary.js";
 // ================== Create Product ==================
 export const createProductController = async (req, res) => {
   try {
-    const {
-      name,
-      description,
-      categoryId,
-      bulkProductId,
-      quantityInGrams,
-      price,
-      purchasePrice,
-    } = req.body;
+    const { name, description, categoryId, stock, price, purchasePrice } =
+      req.body;
 
     // ✅ Required field validation
-    if (!name || !categoryId || !quantityInGrams || !price || !purchasePrice) {
+    if (!name || !categoryId || !price || !purchasePrice) {
       return res.status(400).json({
         error: true,
         message: "Missing required fields",
       });
-    }
-
-    let stockInGrams = 0;
-    if (!bulkProductId) {
-      if (req.body.stockInGrams === undefined) {
-        return res.status(400).json({
-          error: true,
-          message: "stockInGrams is required for bulk product",
-        });
-      }
-      stockInGrams = req.body.stockInGrams;
     }
 
     const images = [];
@@ -49,9 +31,7 @@ export const createProductController = async (req, res) => {
       name,
       description,
       categoryId,
-      bulkProductId: bulkProductId || null,
-      quantityInGrams,
-      stockInGrams,
+      stock: stock || 0,
       price,
       purchasePrice,
       images,
@@ -90,38 +70,34 @@ export const updateProductController = async (req, res) => {
       name,
       description,
       categoryId,
-      bulkProductId,
-      quantityInGrams,
+      stock,
       price,
       purchasePrice,
       isActive,
     } = req.body;
 
-    if (name) product.name = name;
-    if (description) product.description = description;
-    if (categoryId) product.categoryId = categoryId;
-    if (bulkProductId !== undefined) product.bulkProductId = bulkProductId;
-    if (quantityInGrams) product.quantityInGrams = quantityInGrams;
-    if (price) product.price = price;
-    if (purchasePrice) product.purchasePrice = purchasePrice;
+    if (name !== undefined) product.name = name;
+    if (description !== undefined) product.description = description;
+    if (categoryId !== undefined) product.categoryId = categoryId;
+    if (stock !== undefined) product.stock = stock;
+    if (price !== undefined) product.price = price;
+    if (purchasePrice !== undefined) product.purchasePrice = purchasePrice;
     if (isActive !== undefined) product.isActive = isActive;
-    if (!product.bulkProductId && req.body.stockInGrams !== undefined) {
-      product.stockInGrams = req.body.stockInGrams;
-    }
 
+    // 🔄 Replace existing images if new ones are uploaded
     if (req.files && req.files.length > 0) {
+      // Delete old images from Cloudinary
       for (const img of product.images) {
         if (img.public_id) {
           await cloudinary.uploader.destroy(img.public_id);
         }
       }
 
-      const newImages = req.files.map((file) => ({
+      // Add new images
+      product.images = req.files.map((file) => ({
         url: file.path || file.secure_url || file.location,
         public_id: file.filename || file.public_id,
       }));
-
-      product.images = newImages;
     }
 
     await product.save();
@@ -160,15 +136,12 @@ export const deleteProductController = async (req, res) => {
       }
     }
 
-    // ✅ Delete all variants that depend on this product (if it's a bulk product)
-    await Product.deleteMany({ bulkProductId: id });
-
-    // ✅ Delete the main product itself
+    // ✅ Delete the product itself
     await product.deleteOne();
 
     return res.status(200).json({
       success: true,
-      message: "Product and its variants deleted successfully",
+      message: "Product deleted successfully",
     });
   } catch (error) {
     console.error("Delete Product Error:", error);
@@ -211,9 +184,7 @@ export const getSingleProductController = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findById(id)
-      .populate("categoryId", "name")
-      .populate("bulkProductId", "price quantityInGrams");
+    const product = await Product.findById(id).populate("categoryId", "name");
 
     if (!product) {
       return res.status(404).json({
@@ -222,23 +193,9 @@ export const getSingleProductController = async (req, res) => {
       });
     }
 
-    let youSave = "";
-
-    if (product.bulkProductId) {
-      const bulk = product.bulkProductId;
-      const bulkUnitPrice = bulk.price / bulk.quantityInGrams;
-      const thisUnitPrice = product.price / product.quantityInGrams;
-      const priceIfBulkRate = bulkUnitPrice * product.quantityInGrams;
-      const savings = Math.round(product.price - priceIfBulkRate);
-      if (savings > 0) youSave = `₹${savings}`;
-    }
-
     return res.status(200).json({
       success: true,
-      product: {
-        ...product._doc,
-        youSave,
-      },
+      product,
     });
   } catch (error) {
     console.error("Get Single Product Error:", error);
@@ -275,40 +232,16 @@ export const getAllProductsController = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit))
-        .populate("categoryId", "name")
-        .populate("bulkProductId", "price quantityInGrams"),
+        .populate("categoryId", "name"),
       Product.countDocuments(query),
     ]);
-
-    // 🧮 Add formatted savings
-    const modifiedProducts = products.map((product) => {
-      let youSave = "";
-
-      if (product.bulkProductId) {
-        const bulk = product.bulkProductId;
-        const bulkUnitPrice = bulk.price / bulk.quantityInGrams;
-        const thisUnitPrice = product.price / product.quantityInGrams;
-
-        if (thisUnitPrice > bulkUnitPrice) {
-          const priceIfBulkRate = bulkUnitPrice * product.quantityInGrams;
-          const savings = Math.round(product.price - priceIfBulkRate);
-          if (savings > 0) youSave = `₹${savings}`;
-        }
-      }
-
-      return {
-        ...product._doc,
-        youSave,
-        stockInGrams: product.bulkProductId ? undefined : product.stockInGrams, // ✅ optional
-      };
-    });
 
     return res.status(200).json({
       success: true,
       total,
       page: Number(page),
       totalPages: Math.ceil(total / Number(limit)),
-      products: modifiedProducts,
+      products,
     });
   } catch (error) {
     console.error("Get All Products Error:", error);
@@ -343,85 +276,15 @@ export const getProductsByCategoryController = async (req, res) => {
     const products = await Product.find({
       categoryId: { $in: categoryIds },
       isActive: true,
-    })
-      .populate("categoryId", "name")
-      .populate("bulkProductId", "price quantityInGrams");
-
-    // 3. Add `youSave` based on bulkProductId
-    const modifiedProducts = products.map((product) => {
-      let youSave = "";
-
-      if (product.bulkProductId) {
-        const bulk = product.bulkProductId;
-        const bulkUnitPrice = bulk.price / bulk.quantityInGrams;
-        const thisUnitPrice = product.price / product.quantityInGrams;
-
-        if (thisUnitPrice > bulkUnitPrice) {
-          const priceIfBulkRate = bulkUnitPrice * product.quantityInGrams;
-          const savings = Math.round(product.price - priceIfBulkRate);
-          if (savings > 0) {
-            youSave = `₹${savings}`;
-          }
-        }
-      }
-
-      return {
-        ...product._doc,
-        youSave,
-      };
-    });
+    }).populate("categoryId", "name");
 
     return res.status(200).json({
       success: true,
-      total: modifiedProducts.length,
-      products: modifiedProducts,
+      total: products.length,
+      products,
     });
   } catch (error) {
     console.error("Get Products by Category Error:", error);
-    return res.status(500).json({
-      error: true,
-      message: "Internal Server Error",
-    });
-  }
-};
-
-// ================== Get Bulk Stock ==================
-export const getBulkStockController = async (req, res) => {
-  try {
-    const bulkProducts = await Product.find({
-      bulkProductId: null,
-      isActive: true,
-    }).select("name stockInGrams quantityInGrams");
-
-    return res.status(200).json({
-      success: true,
-      products: bulkProducts,
-    });
-  } catch (error) {
-    console.error("Get Bulk Stock Error:", error);
-    return res.status(500).json({
-      error: true,
-      message: "Internal Server Error",
-    });
-  }
-};
-
-// ================== Get Variants by Bulk Product ==================
-export const getVariantsByBulkProductController = async (req, res) => {
-  try {
-    const { bulkId } = req.params;
-
-    const variants = await Product.find({
-      bulkProductId: bulkId,
-      isActive: true,
-    });
-
-    return res.status(200).json({
-      success: true,
-      variants,
-    });
-  } catch (error) {
-    console.error("Get Variants Error:", error);
     return res.status(500).json({
       error: true,
       message: "Internal Server Error",

@@ -1,4 +1,3 @@
-import e from "express";
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
@@ -17,17 +16,14 @@ const orderSchema = new mongoose.Schema(
           required: true,
         },
         name: String,
-        quantity: Number, // how many packs ordered
-        quantityInGrams: Number, // grams per pack (e.g. 500g)
+        quantity: Number, // how many units ordered
         pricePerUnit: Number,
         subtotal: Number,
-        profit: Number,
       },
     ],
 
     totalAmount: { type: Number, required: true },
-
-    totalProfit: { type: Number, default: 0 },
+    totalProfit: { type: Number, required: true },
 
     status: {
       type: String,

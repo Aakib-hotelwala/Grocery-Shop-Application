@@ -114,8 +114,9 @@ export const recordManualSale = async (req, res) => {
   try {
     const { products } = req.body; // [{ productId, quantity }]
 
-    if (!products || !products.length)
+    if (!products || !products.length) {
       return res.status(400).json({ error: true, message: "No products" });
+    }
 
     let totalAmount = 0;
     let totalProfit = 0;
@@ -124,20 +125,19 @@ export const recordManualSale = async (req, res) => {
     for (const item of products) {
       try {
         if (!item.productId || item.quantity < 1) {
-          continue; // ⛔️ Skip invalid or zero quantity
+          continue; // Skip invalid item
         }
 
         const product = await Product.findById(item.productId);
         if (!product || !product.isActive) {
-          continue; // ⛔️ Skip inactive or missing products
+          continue; // Skip inactive or missing product
         }
 
-        const requiredStock = item.quantity * product.quantityInGrams;
-        if (product.stockInGrams < requiredStock) {
-          continue; // ⛔️ Skip if insufficient stock
+        if (product.stock < item.quantity) {
+          continue; // Skip if insufficient stock
         }
 
-        product.stockInGrams -= requiredStock;
+        product.stock -= item.quantity;
         await product.save();
 
         const subtotal = product.price * item.quantity;
@@ -150,14 +150,12 @@ export const recordManualSale = async (req, res) => {
           productId: product._id,
           name: product.name,
           quantity: item.quantity,
-          quantityInGrams: product.quantityInGrams,
           pricePerUnit: product.price,
           subtotal,
-          profit,
         });
       } catch (err) {
         console.error("Manual sale item error:", err.message);
-        continue; // ⛔️ Skip and continue if any product fails
+        continue;
       }
     }
 
