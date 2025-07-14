@@ -14,6 +14,7 @@ import { get, post } from "../../../services/endpoints";
 import API_ROUTES from "../../../services/apiRoutes";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 
 const GradientPaper = styled("div")(({ theme }) => ({
   background: theme.components?.custom?.cardGradient,
@@ -97,18 +98,42 @@ const CreateProduct = () => {
     }
   };
 
+  const preventInvalidNumberInput = (e) => {
+    if (["e", "E", "+", "-"].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !price || !purchasePrice || !selectedCategory) {
-      return alert("Please fill in all required fields.");
-    }
+
+    const parsedPrice = parseFloat(price);
+    const parsedPurchasePrice = parseFloat(purchasePrice);
+    const parsedStock = parseInt(stock || "0");
+
+    if (!name.trim()) return toast.error("Product name is required.");
+    if (!selectedCategory) return toast.error("Please select a category.");
+    if (!price || isNaN(parsedPrice) || parsedPrice <= 0)
+      return toast.error("Selling price must be a positive number.");
+    if (
+      !purchasePrice ||
+      isNaN(parsedPurchasePrice) ||
+      parsedPurchasePrice <= 0
+    )
+      return toast.error("Purchase price must be a positive number.");
+    if (parsedPrice <= parsedPurchasePrice)
+      return toast.error("Selling price must be greater than purchase price.");
+    if (isNaN(parsedStock) || parsedStock < 0)
+      return toast.error("Stock cannot be negative.");
+    if (images.length === 0)
+      return toast.error("Please upload at least one product image.");
 
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
-    formData.append("price", price);
-    formData.append("purchasePrice", purchasePrice);
-    formData.append("stock", stock || 0);
+    formData.append("price", parsedPrice);
+    formData.append("purchasePrice", parsedPurchasePrice);
+    formData.append("stock", parsedStock);
     formData.append("categoryId", selectedCategory._id);
     images.forEach((file) => formData.append("images", file));
 
@@ -117,10 +142,11 @@ const CreateProduct = () => {
       await post(API_ROUTES.CREATE_PRODUCT, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      toast.success("Product created successfully!");
       navigate("/admin/products");
     } catch (err) {
       console.error("Failed to create product", err);
-      alert("Failed to create product");
+      toast.error("Failed to create product.");
     } finally {
       setLoading(false);
     }
@@ -271,6 +297,13 @@ const CreateProduct = () => {
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
+              slotProps={{
+                input: {
+                  min: 1,
+                },
+              }}
+              onKeyDown={preventInvalidNumberInput}
+              onWheel={(e) => e.target.blur()}
               fullWidth
               required
             />
@@ -280,6 +313,13 @@ const CreateProduct = () => {
               type="number"
               value={purchasePrice}
               onChange={(e) => setPurchasePrice(e.target.value)}
+              slotProps={{
+                input: {
+                  min: 1,
+                },
+              }}
+              onKeyDown={preventInvalidNumberInput}
+              onWheel={(e) => e.target.blur()}
               fullWidth
               required
             />
@@ -289,6 +329,13 @@ const CreateProduct = () => {
               type="number"
               value={stock}
               onChange={(e) => setStock(e.target.value)}
+              slotProps={{
+                input: {
+                  min: 0,
+                },
+              }}
+              onKeyDown={preventInvalidNumberInput}
+              onWheel={(e) => e.target.blur()}
               fullWidth
             />
 

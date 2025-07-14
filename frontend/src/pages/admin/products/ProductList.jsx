@@ -152,7 +152,8 @@ const ProductList = () => {
                   <TableRow>
                     <TableCell>Product</TableCell>
                     <TableCell>Category</TableCell>
-                    <TableCell>Price</TableCell>
+                    <TableCell>Selling Price</TableCell>
+                    <TableCell>Purchase Price</TableCell>
                     <TableCell>Stock</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell align="center">Actions</TableCell>
@@ -173,6 +174,7 @@ const ProductList = () => {
                       </TableCell>
                       <TableCell>{product.categoryId?.name || "-"}</TableCell>
                       <TableCell>₹{product.price}</TableCell>
+                      <TableCell>₹{product.purchasePrice}</TableCell>
                       <TableCell>{product.stock}</TableCell>
                       <TableCell>
                         <Switch
