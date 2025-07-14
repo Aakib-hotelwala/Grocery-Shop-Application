@@ -49,6 +49,9 @@ export const refreshToken = async () => {
     }
   } catch (err) {
     console.error("Token refresh failed:", err);
+
+    useAuthStore.getState().logout();
+    window.location.href = "/login";
   }
 };
 
