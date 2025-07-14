@@ -65,8 +65,15 @@ const CreateProduct = () => {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
     const total = [...images, ...files].slice(0, 5);
     setImages(total);
+
+    // Reset input so same file can be selected again
+    if (imageInputRef.current) {
+      imageInputRef.current.value = null;
+    }
   };
 
   const handleDrop = (e) => {
@@ -83,6 +90,11 @@ const CreateProduct = () => {
     const updated = [...images];
     updated.splice(index, 1);
     setImages(updated);
+
+    // Reset file input when all images are removed
+    if (updated.length === 0 && imageInputRef.current) {
+      imageInputRef.current.value = null;
+    }
   };
 
   const handleSubmit = async (e) => {

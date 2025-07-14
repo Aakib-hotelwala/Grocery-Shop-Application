@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -9,6 +9,8 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { get, post } from "../../../services/endpoints";
 import API_ROUTES from "../../../services/apiRoutes";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +34,8 @@ const CategoryCreate = () => {
   const [parentCategoryId, setParentCategoryId] = useState("");
   const [mainCategories, setMainCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const imageInputRef = useRef(null);
 
   useEffect(() => {
     const fetchMain = async () => {
@@ -94,21 +98,18 @@ const CategoryCreate = () => {
             {/* Image Upload - Centered */}
             <Box display="flex" justifyContent="center">
               <Box
-                onClick={() => document.getElementById("image-upload").click()}
+                onClick={() => imageInputRef.current?.click()}
                 onDragOver={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
                   e.currentTarget.style.borderColor =
                     theme.palette.primary.main;
                 }}
                 onDragLeave={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
                   e.currentTarget.style.borderColor = theme.palette.divider;
                 }}
                 onDrop={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
                   const file = e.dataTransfer.files[0];
                   if (file && file.type.startsWith("image/")) {
                     setImage(file);
@@ -135,6 +136,7 @@ const CategoryCreate = () => {
                   type="file"
                   accept="image/*"
                   id="image-upload"
+                  ref={imageInputRef}
                   style={{ display: "none" }}
                   onChange={(e) => setImage(e.target.files[0])}
                 />
@@ -150,11 +152,15 @@ const CategoryCreate = () => {
                         objectFit: "cover",
                       }}
                     />
-                    <Box
+                    <IconButton
+                      size="small"
                       onClick={(e) => {
                         e.stopPropagation();
                         setImage(null);
                         setPreview(null);
+                        if (imageInputRef.current) {
+                          imageInputRef.current.value = null;
+                        }
                       }}
                       sx={{
                         position: "absolute",
@@ -162,19 +168,20 @@ const CategoryCreate = () => {
                         right: 6,
                         backgroundColor: "rgba(0,0,0,0.6)",
                         color: "white",
-                        borderRadius: "50%",
                         width: 24,
                         height: 24,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 16,
-                        cursor: "pointer",
+                        padding: 0,
                         zIndex: 1,
+                        "&:hover": {
+                          backgroundColor: "rgba(0,0,0,0.8)",
+                        },
                       }}
                     >
-                      ×
-                    </Box>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </>
                 ) : (
                   <Typography variant="h2" color="text.secondary">
