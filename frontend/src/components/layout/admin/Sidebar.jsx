@@ -15,6 +15,7 @@ import {
   Group,
   InsertChart,
   Inventory,
+  ReceiptLong,
 } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 
@@ -25,6 +26,11 @@ const navItems = [
   { label: "Categories", icon: <Category />, path: "/admin/categories" },
   { label: "Orders", icon: <ShoppingCart />, path: "/admin/orders" },
   { label: "Analytics", icon: <InsertChart />, path: "/admin/analytics" },
+  {
+    label: "Manual Sale",
+    icon: <ReceiptLong />,
+    path: "/admin/analytics/manual-sale",
+  },
 ];
 
 const Sidebar = ({ mobileOpen, onClose, isMobile }) => {

@@ -14,6 +14,7 @@ import OrderList from "../pages/admin/orders/OrderList";
 import OrderDetail from "../pages/admin/orders/OrderDetail";
 import AnalyticsDashboard from "../pages/admin/analytics/AnalyticsDashboard";
 import AdminProfile from "../pages/admin/profile/AdminProfile";
+import ManualSale from "../pages/admin/analytics/ManualSale";
 
 const AdminRoutes = () => {
   return (
@@ -43,6 +44,7 @@ const AdminRoutes = () => {
 
         {/* Analytics */}
         <Route path="analytics" element={<AnalyticsDashboard />} />
+        <Route path="analytics/manual-sale" element={<ManualSale />} />
       </Route>
     </Routes>
   );
