@@ -224,7 +224,11 @@ const ProductList = () => {
           undone.
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            color="secondary"
+            sx={{ color: "#fff" }}
+          >
             Cancel
           </Button>
           <Button

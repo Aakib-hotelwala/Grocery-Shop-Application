@@ -84,20 +84,28 @@ export const updateProductController = async (req, res) => {
     if (purchasePrice !== undefined) product.purchasePrice = purchasePrice;
     if (isActive !== undefined) product.isActive = isActive;
 
-    // 🔄 Replace existing images if new ones are uploaded
     if (req.files && req.files.length > 0) {
-      // Delete old images from Cloudinary
-      for (const img of product.images) {
+      const existingImages = JSON.parse(req.body.existingImages || "[]");
+
+      // Delete removed images from Cloudinary
+      const removedImages = product.images.filter(
+        (img) => !existingImages.some((ei) => ei.public_id === img.public_id)
+      );
+      for (const img of removedImages) {
         if (img.public_id) {
           await cloudinary.uploader.destroy(img.public_id);
         }
       }
 
-      // Add new images
-      product.images = req.files.map((file) => ({
+      // Add newly uploaded images
+      const newUploadedImages = req.files.map((file) => ({
         url: file.path || file.secure_url || file.location,
         public_id: file.filename || file.public_id,
       }));
+
+      product.images = [...existingImages, ...newUploadedImages];
+    } else if (req.body.existingImages) {
+      product.images = JSON.parse(req.body.existingImages);
     }
 
     await product.save();
