@@ -44,7 +44,7 @@ const AdminRoutes = () => {
 
         {/* Analytics */}
         <Route path="analytics" element={<AnalyticsDashboard />} />
-        <Route path="analytics/manual-sale" element={<ManualSale />} />
+        <Route path="manual-sale" element={<ManualSale />} />
       </Route>
     </Routes>
   );

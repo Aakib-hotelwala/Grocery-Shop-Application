@@ -29,7 +29,7 @@ const navItems = [
   {
     label: "Manual Sale",
     icon: <ReceiptLong />,
-    path: "/admin/analytics/manual-sale",
+    path: "/admin/manual-sale",
   },
 ];
 
