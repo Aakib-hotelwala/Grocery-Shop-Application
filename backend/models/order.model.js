@@ -5,7 +5,7 @@ const orderSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
 
     products: [
@@ -30,7 +30,10 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "completed", "cancelled"],
       default: "pending",
     },
+
+    isManualSale: { type: Boolean, default: false },
   },
+
   { timestamps: true }
 );
 

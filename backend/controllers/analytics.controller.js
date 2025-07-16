@@ -166,11 +166,11 @@ export const recordManualSale = async (req, res) => {
     }
 
     const order = new Order({
-      userId: null, // Manual/in-shop sale
       products: orderProducts,
       totalAmount,
       totalProfit,
       status: "completed",
+      isManualSale: true,
     });
 
     await order.save();
