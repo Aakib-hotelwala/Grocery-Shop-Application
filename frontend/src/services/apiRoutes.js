@@ -53,6 +53,7 @@ const API_ROUTES = {
   TOP_PRODUCTS: "/analytics/top-products",
   REVENUE_OVER_TIME: "/analytics/revenue-over-time",
   SALES_BY_CATEGORY: "/analytics/sales-by-category",
+  ADMIN_STATS: "/analytics/admin-stats",
   EXPORT_ORDERS_CSV: "/analytics/export/orders/csv",
   EXPORT_ORDERS_PDF: "/analytics/export/orders/pdf",
   RECORD_MANUAL_SALE: "/analytics/manual-sale",

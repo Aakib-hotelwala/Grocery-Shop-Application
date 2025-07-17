@@ -8,6 +8,7 @@ import {
   getSalesByCategory,
   exportOrdersCSV,
   exportOrdersPDF,
+  getAdminStats,
 } from "../controllers/analytics.controller.js";
 import { requireAuth, requireRole } from "../middleware/authMiddleware.js";
 
@@ -30,6 +31,9 @@ router.get("/revenue-over-time", getRevenueOverTime);
 
 // 📊 Sales by category
 router.get("/sales-by-category", getSalesByCategory);
+
+// 📊 Admin statistics overview
+router.get("/admin-stats", getAdminStats);
 
 // 🧾 Export orders report as CSV
 router.get("/export/orders/csv", exportOrdersCSV);

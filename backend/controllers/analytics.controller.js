@@ -1,5 +1,6 @@
 import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
+import User from "../models/user.model.js";
 import { Parser } from "json2csv";
 import PDFDocument from "pdfkit";
 
@@ -295,6 +296,34 @@ export const getSalesByCategory = async (req, res) => {
   } catch (error) {
     console.error("Sales By Category Error:", error);
     res.status(500).json({ error: true, message: "Internal Server Error" });
+  }
+};
+
+// ================== Get Admin Stats ==================
+export const getAdminStats = async (req, res) => {
+  try {
+    const [totalUsers, totalProducts, totalOrders] = await Promise.all([
+      User.countDocuments({}),
+      Product.countDocuments({}),
+      Order.countDocuments({}),
+    ]);
+
+    const revenueAgg = await Order.aggregate([
+      { $match: { status: "completed" } },
+      { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+    ]);
+
+    const totalRevenue = revenueAgg[0]?.total || 0;
+
+    res.json({
+      totalUsers,
+      totalProducts,
+      totalOrders,
+      totalRevenue,
+    });
+  } catch (err) {
+    console.error("Admin Stats Error:", err.message);
+    res.status(500).json({ error: true, message: "Failed to fetch stats" });
   }
 };
 
