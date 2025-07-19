@@ -3,20 +3,32 @@ import { Box, Typography, CircularProgress } from "@mui/material";
 import { get } from "../../services/endpoints";
 import API_ROUTES from "../../services/apiRoutes";
 import { useOutletContext } from "react-router-dom";
+import CategoryRow from "../../components/common/CategoryRow";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [groupedProducts, setGroupedProducts] = useState({});
+  const { search } = useOutletContext();
 
-  const { search, setSearch } = useOutletContext();
+  const groupByCategory = (products) => {
+    const grouped = {};
+    for (let p of products) {
+      const category = p?.categoryId?.name || "Uncategorized";
+      if (!grouped[category]) grouped[category] = [];
+      grouped[category].push(p);
+    }
+    return grouped;
+  };
 
-  const fetchProducts = async (keyword = "") => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
       const params = {};
-      if (keyword) params.keyword = keyword;
+      if (search) params.keyword = search;
+
       const data = await get(API_ROUTES.GET_ALL_PRODUCTS, params);
-      setProducts(data?.products || []);
+      const grouped = groupByCategory(data?.products || []);
+      setGroupedProducts(grouped);
     } catch (err) {
       console.error("Failed to fetch products", err);
     } finally {
@@ -25,30 +37,25 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchProducts(search);
+    fetchProducts();
   }, [search]);
 
   return (
-    <Box>
+    <Box px={2} py={2}>
       {loading ? (
         <Box display="flex" justifyContent="center" mt={4}>
           <CircularProgress />
         </Box>
       ) : (
-        <Box mt={2}>
-          <Typography variant="h6" gutterBottom>
-            Products
-          </Typography>
-          {products.length === 0 ? (
+        <>
+          {Object.keys(groupedProducts).length === 0 ? (
             <Typography>No products found.</Typography>
           ) : (
-            <ul>
-              {products.map((product) => (
-                <li key={product._id}>{product.name}</li>
-              ))}
-            </ul>
+            Object.entries(groupedProducts).map(([category, items]) => (
+              <CategoryRow key={category} title={category} products={items} />
+            ))
           )}
-        </Box>
+        </>
       )}
     </Box>
   );

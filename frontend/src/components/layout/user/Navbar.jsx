@@ -239,16 +239,20 @@ const Navbar = ({ search, setSearch }) => {
           <Divider />
 
           <List>
-            <ListItem button onClick={() => navigate("/user/profile")}>
+            <ListItem
+              button
+              sx={{ cursor: "pointer" }}
+              onClick={() => navigate("/user/profile")}
+            >
               <ListItemText primary="Profile" />
             </ListItem>
-            <ListItem button onClick={toggleTheme}>
+            <ListItem button sx={{ cursor: "pointer" }} onClick={toggleTheme}>
               <ListItemText
                 primary={mode === "light" ? "Dark Mode" : "Light Mode"}
               />
               {mode === "light" ? <FiMoon size={20} /> : <FiSun size={20} />}
             </ListItem>
-            <ListItem button onClick={handleLogout}>
+            <ListItem button sx={{ cursor: "pointer" }} onClick={handleLogout}>
               <ListItemText primary="Logout" />
             </ListItem>
           </List>

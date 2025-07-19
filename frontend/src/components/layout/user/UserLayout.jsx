@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Navbar from "./Navbar";
 import { Outlet } from "react-router-dom";
@@ -6,7 +6,16 @@ import { Outlet } from "react-router-dom";
 const UserLayout = () => {
   const theme = useTheme();
 
+  const [rawSearch, setRawSearch] = useState("");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      setSearch(rawSearch);
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [rawSearch]);
 
   return (
     <Box
@@ -17,7 +26,7 @@ const UserLayout = () => {
       sx={{ overflowX: "hidden" }}
       bgcolor={theme.palette.background.default}
     >
-      <Navbar search={search} setSearch={setSearch} />
+      <Navbar search={rawSearch} setSearch={setRawSearch} />
       <Box
         component="main"
         flexGrow={1}
@@ -28,7 +37,7 @@ const UserLayout = () => {
           overflowX: "hidden",
         }}
       >
-        <Outlet context={{ search, setSearch }} />
+        <Outlet context={{ search, setSearch: setRawSearch }} />
       </Box>
     </Box>
   );
