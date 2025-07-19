@@ -4,7 +4,6 @@ import Navbar from "./Navbar";
 import { Outlet } from "react-router-dom";
 
 const UserLayout = () => {
-  const isMobile = useMediaQuery("(max-width:768px)");
   const theme = useTheme();
 
   const [search, setSearch] = useState("");
@@ -25,8 +24,8 @@ const UserLayout = () => {
         p={{ xs: 2, sm: 3 }}
         sx={{
           width: "100%",
-          maxWidth: "100vw", // prevent horizontal scroll
-          overflowX: "hidden", // avoid scrollbars if any child overflows
+          maxWidth: "100vw",
+          overflowX: "hidden",
         }}
       >
         <Outlet context={{ search, setSearch }} />

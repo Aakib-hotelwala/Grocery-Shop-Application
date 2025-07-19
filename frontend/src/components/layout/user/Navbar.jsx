@@ -15,13 +15,12 @@ import {
   useMediaQuery,
   Paper,
   InputBase,
-  TextField,
 } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
 import { FaUserCircle } from "react-icons/fa";
 import { FiMoon, FiSun } from "react-icons/fi";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../../store/authStore";
@@ -68,8 +67,8 @@ const Navbar = ({ search, setSearch }) => {
             alt="Grocery Shop Logo"
             onClick={() => navigate("/user/home")}
             sx={{
-              height: { xs: 70, sm: 80 }, // bigger height
-              width: "auto", // maintain aspect ratio
+              height: { xs: 70, sm: 80 },
+              width: "auto",
               cursor: "pointer",
               px: 1,
               objectFit: "contain",
@@ -80,19 +79,27 @@ const Navbar = ({ search, setSearch }) => {
             <Paper
               component="form"
               onSubmit={(e) => e.preventDefault()}
+              elevation={0}
               sx={{
                 display: "flex",
                 alignItems: "center",
                 px: 1.5,
                 py: 0.5,
                 borderRadius: "20px",
-                bgcolor: "background.default",
-                boxShadow: 1,
+                bgcolor: "transparent",
+                boxShadow: "none",
+                border: "1px solid",
+                borderColor: "divider",
                 maxWidth: 300,
                 width: "100%",
+                transition: "border-color 0.2s",
+                "&:focus-within": {
+                  borderColor: "primary.main",
+                },
               }}
             >
               <SearchIcon sx={{ mr: 1, color: "text.secondary" }} />
+
               <InputBase
                 placeholder="Search products..."
                 fullWidth
@@ -101,6 +108,19 @@ const Navbar = ({ search, setSearch }) => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
+
+              {search && (
+                <ClearIcon
+                  onClick={() => setSearch("")}
+                  sx={{
+                    ml: 1,
+                    cursor: "pointer",
+                    fontSize: 20,
+                    color: "text.secondary",
+                    "&:hover": { color: "text.primary" },
+                  }}
+                />
+              )}
             </Paper>
           ) : showMobileSearch ? (
             <Box
