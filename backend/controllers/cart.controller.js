@@ -8,7 +8,7 @@ export const getCartController = async (req, res) => {
 
     const cart = await Cart.findOne({ userId }).populate(
       "products.productId",
-      "name price images"
+      "name price images stock"
     );
 
     if (!cart) {

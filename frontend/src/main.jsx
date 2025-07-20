@@ -1,4 +1,3 @@
-// main.jsx or index.jsx
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
@@ -28,4 +27,11 @@ const AppWithTheme = () => {
   );
 };
 
-createRoot(document.getElementById("root")).render(<AppWithTheme />);
+// ✅ Only create root once
+const container = document.getElementById("root");
+
+if (!container._reactRoot) {
+  container._reactRoot = createRoot(container);
+}
+
+container._reactRoot.render(<AppWithTheme />);

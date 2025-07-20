@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import Navbar from "./Navbar";
 import { Outlet } from "react-router-dom";
 
@@ -10,9 +10,11 @@ const UserLayout = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    const trimmed = rawSearch.trim();
+
     const delayDebounce = setTimeout(() => {
-      setSearch(rawSearch);
-    }, 500);
+      setSearch(trimmed);
+    }, 400); // Slightly faster debounce
 
     return () => clearTimeout(delayDebounce);
   }, [rawSearch]);
@@ -37,7 +39,7 @@ const UserLayout = () => {
           overflowX: "hidden",
         }}
       >
-        <Outlet context={{ search, setSearch: setRawSearch }} />
+        <Outlet context={{ search }} />
       </Box>
     </Box>
   );

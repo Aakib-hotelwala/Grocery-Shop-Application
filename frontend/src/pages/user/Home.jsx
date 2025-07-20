@@ -11,20 +11,21 @@ const Home = () => {
   const { search } = useOutletContext();
 
   const groupByCategory = (products) => {
-    const grouped = {};
-    for (let p of products) {
-      const category = p?.categoryId?.name || "Uncategorized";
-      if (!grouped[category]) grouped[category] = [];
-      grouped[category].push(p);
-    }
-    return grouped;
+    return products.reduce((acc, product) => {
+      const category = product?.categoryId?.name || "Uncategorized";
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(product);
+      return acc;
+    }, {});
   };
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const params = {};
-      if (search) params.keyword = search;
+      if (search?.length > 0) {
+        params.keyword = search;
+      }
 
       const data = await get(API_ROUTES.GET_ALL_PRODUCTS, params);
       const grouped = groupByCategory(data?.products || []);
@@ -46,16 +47,12 @@ const Home = () => {
         <Box display="flex" justifyContent="center" mt={4}>
           <CircularProgress />
         </Box>
+      ) : Object.keys(groupedProducts).length === 0 ? (
+        <Typography>No products found.</Typography>
       ) : (
-        <>
-          {Object.keys(groupedProducts).length === 0 ? (
-            <Typography>No products found.</Typography>
-          ) : (
-            Object.entries(groupedProducts).map(([category, items]) => (
-              <CategoryRow key={category} title={category} products={items} />
-            ))
-          )}
-        </>
+        Object.entries(groupedProducts).map(([category, items]) => (
+          <CategoryRow key={category} title={category} products={items} />
+        ))
       )}
     </Box>
   );

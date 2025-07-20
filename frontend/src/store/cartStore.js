@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { get, post, put, del } from "../services/endpoints";
 import API_ROUTES from "../services/apiRoutes";
-import { toast } from "react-toastify";
 
 const useCartStore = create((set) => ({
   cart: [],
@@ -22,30 +21,27 @@ const useCartStore = create((set) => ({
   addToCart: async (item) => {
     try {
       await post(API_ROUTES.ADD_TO_CART, item);
-      toast.success("Added to cart");
       useCartStore.getState().fetchCart();
     } catch (err) {
-      toast.error("Add to cart failed");
+      console.error("Add to cart failed:", err);
     }
   },
 
   updateCartItem: async (item) => {
     try {
       await put(API_ROUTES.UPDATE_CART_ITEM, item);
-      toast.success("Updated cart item");
       useCartStore.getState().fetchCart();
     } catch (err) {
-      toast.error("Update failed");
+      console.error("Update failed:", err);
     }
   },
 
   removeCartItem: async (productId) => {
     try {
       await del(API_ROUTES.REMOVE_CART_ITEM, { data: { productId } });
-      toast.success("Removed from cart");
       useCartStore.getState().fetchCart();
     } catch (err) {
-      toast.error("Remove failed");
+      console.error("Remove failed:", err);
     }
   },
 
@@ -53,9 +49,8 @@ const useCartStore = create((set) => ({
     try {
       await del(API_ROUTES.CLEAR_CART);
       set({ cart: [] });
-      toast.success("Cart cleared");
     } catch (err) {
-      toast.error("Clear failed");
+      console.error("Clear failed:", err);
     }
   },
 }));

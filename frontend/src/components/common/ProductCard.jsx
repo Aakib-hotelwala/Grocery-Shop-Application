@@ -11,29 +11,45 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useCartStore from "../../store/cartStore";
 
 const ProductCard = ({ product }) => {
+  const { cart, addToCart, updateCartItem, removeCartItem } = useCartStore();
   const [quantity, setQuantity] = useState(0);
 
-  const handleAddToCart = () => {
-    setQuantity(1);
-    // Add to cart logic here
+  // 🧠 Sync quantity with cartStore
+  useEffect(() => {
+    const cartItem = cart.find(
+      (item) =>
+        item.productId?._id === product._id || item.productId === product._id
+    );
+
+    setQuantity(cartItem ? cartItem.quantity : 0);
+  }, [cart, product._id]);
+
+  const handleAddToCart = async () => {
+    if (product.stock <= 0) return;
+    await addToCart({ productId: product._id, quantity: 1 });
   };
 
-  const increase = () => {
-    setQuantity((prev) => prev + 1);
-    // Update cart logic
+  const handleIncrease = async () => {
+    if (quantity < product.stock) {
+      await updateCartItem({
+        productId: product._id,
+        quantity: quantity + 1,
+      });
+    }
   };
 
-  const decrease = () => {
+  const handleDecrease = async () => {
     if (quantity === 1) {
-      setQuantity(0);
-      // Remove from cart logic
-    } else {
-      setQuantity((prev) => prev - 1);
-      // Update cart logic
+      await removeCartItem(product._id);
+    } else if (quantity > 1) {
+      await updateCartItem({
+        productId: product._id,
+        quantity: quantity - 1,
+      });
     }
   };
 
@@ -41,7 +57,7 @@ const ProductCard = ({ product }) => {
     <Card
       sx={{
         width: 140,
-        height: 210,
+        height: 230,
         mr: 1.5,
         boxShadow: 2,
         borderRadius: 1,
@@ -87,32 +103,24 @@ const ProductCard = ({ product }) => {
             {product.name}
           </Typography>
 
-          <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Box mt={0.5}>
             <Typography
               variant="body2"
-              sx={{ fontSize: 13, fontWeight: 500, color: "text.secondary" }}
+              sx={{ fontSize: 13, fontWeight: 500, color: "text.primary" }}
             >
               ₹{product.price}
             </Typography>
-
-            {quantity > 0 && (
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "green",
-                  bgcolor: "green.50",
-                  px: 0.6,
-                  py: 0.1,
-                  borderRadius: 1,
-                }}
-              >
-                Subtotal: ₹{product.price * quantity}
-              </Typography>
-            )}
-          </Stack>
+            <Typography
+              variant="caption"
+              color={product.stock > 0 ? "text.secondary" : "error"}
+              sx={{ fontSize: 12 }}
+            >
+              {product.stock > 0 ? `Stock: ${product.stock}` : "Out of stock"}
+            </Typography>
+          </Box>
         </Box>
 
+        {/* ✅ Action buttons */}
         <Box mt={1}>
           {quantity === 0 ? (
             <Button
@@ -121,6 +129,7 @@ const ProductCard = ({ product }) => {
               fullWidth
               startIcon={<ShoppingCartIcon fontSize="small" />}
               onClick={handleAddToCart}
+              disabled={product.stock === 0}
               sx={{
                 borderRadius: "4px",
                 textTransform: "none",
@@ -137,13 +146,18 @@ const ProductCard = ({ product }) => {
               justifyContent="center"
               alignItems="center"
             >
-              <IconButton size="small" onClick={decrease} color="primary">
+              <IconButton size="small" onClick={handleDecrease} color="primary">
                 <RemoveIcon fontSize="small" />
               </IconButton>
               <Typography fontSize={13} fontWeight="bold">
                 {quantity}
               </Typography>
-              <IconButton size="small" onClick={increase} color="primary">
+              <IconButton
+                size="small"
+                onClick={handleIncrease}
+                color="primary"
+                disabled={quantity >= product.stock}
+              >
                 <AddIcon fontSize="small" />
               </IconButton>
             </Stack>

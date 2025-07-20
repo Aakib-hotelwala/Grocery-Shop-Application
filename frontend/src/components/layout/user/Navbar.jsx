@@ -23,22 +23,26 @@ import { FiMoon, FiSun } from "react-icons/fi";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import useAuthStore from "../../../store/authStore";
 import useThemeStore from "../../../store/themeStore";
+import useCartStore from "../../../store/cartStore"; // ✅ import cart
 
 const Navbar = ({ search, setSearch }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const navigate = useNavigate();
-
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const navigate = useNavigate();
 
   const mode = useThemeStore((state) => state.mode);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+
+  const cart = useCartStore((state) => state.cart);
+  const cartItemCount = cart.length;
 
   const toggleDrawer = (open) => () => setDrawerOpen(open);
 
@@ -146,7 +150,12 @@ const Navbar = ({ search, setSearch }) => {
                 onChange={(e) => setSearch(e.target.value)}
                 sx={{ fontSize: 16 }}
               />
-              <IconButton onClick={() => setShowMobileSearch(false)}>
+              <IconButton
+                onClick={() => {
+                  setShowMobileSearch(false);
+                  setSearch(""); // ✅ clear on mobile close
+                }}
+              >
                 ✖
               </IconButton>
             </Box>
@@ -159,14 +168,12 @@ const Navbar = ({ search, setSearch }) => {
               </IconButton>
             )}
 
-            {/* Cart */}
             <IconButton color="inherit" onClick={() => navigate("/user/cart")}>
-              <Badge badgeContent={0} color="primary">
+              <Badge badgeContent={cartItemCount} color="primary">
                 <AiOutlineShoppingCart size={24} />
               </Badge>
             </IconButton>
 
-            {/* Avatar */}
             <IconButton onClick={toggleDrawer(true)} sx={{ p: 0 }}>
               <Box
                 sx={{
@@ -195,7 +202,6 @@ const Navbar = ({ search, setSearch }) => {
         </Toolbar>
       </AppBar>
 
-      {/* Right Drawer */}
       <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
         <Box
           width={250}
@@ -239,20 +245,16 @@ const Navbar = ({ search, setSearch }) => {
           <Divider />
 
           <List>
-            <ListItem
-              button
-              sx={{ cursor: "pointer" }}
-              onClick={() => navigate("/user/profile")}
-            >
+            <ListItem button onClick={() => navigate("/user/profile")}>
               <ListItemText primary="Profile" />
             </ListItem>
-            <ListItem button sx={{ cursor: "pointer" }} onClick={toggleTheme}>
+            <ListItem button onClick={toggleTheme}>
               <ListItemText
                 primary={mode === "light" ? "Dark Mode" : "Light Mode"}
               />
               {mode === "light" ? <FiMoon size={20} /> : <FiSun size={20} />}
             </ListItem>
-            <ListItem button sx={{ cursor: "pointer" }} onClick={handleLogout}>
+            <ListItem button onClick={handleLogout}>
               <ListItemText primary="Logout" />
             </ListItem>
           </List>

@@ -66,4 +66,4 @@ export const put = (url, data) => handleRequest(instance.put(url, data));
 
 export const patch = (url, data) => handleRequest(instance.patch(url, data));
 
-export const del = (url) => handleRequest(instance.delete(url));
+export const del = (url, data) => handleRequest(instance.delete(url, data));
