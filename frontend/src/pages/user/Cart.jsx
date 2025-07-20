@@ -29,6 +29,8 @@ const Cart = () => {
     updateCartItem,
     removeCartItem,
     clearCart,
+    removeItemLocally,
+    updateItemLocally,
   } = useCartStore();
 
   const theme = useTheme();
@@ -43,9 +45,11 @@ const Cart = () => {
     const productId = item.productId._id;
 
     if (newQty < 1) {
-      await removeCartItem(productId);
+      removeItemLocally(productId);
+      removeCartItem(productId);
     } else {
-      await updateCartItem({ productId, quantity: newQty });
+      updateItemLocally(productId, newQty);
+      updateCartItem({ productId, quantity: newQty });
     }
   };
 
@@ -173,7 +177,10 @@ const Cart = () => {
                       <TableCell align="center">
                         <IconButton
                           color="error"
-                          onClick={() => removeCartItem(product._id)}
+                          onClick={() => {
+                            removeItemLocally(product._id);
+                            removeCartItem(product._id);
+                          }}
                         >
                           <DeleteIcon />
                         </IconButton>

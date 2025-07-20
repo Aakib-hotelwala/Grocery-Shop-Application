@@ -15,41 +15,49 @@ import { useEffect, useState } from "react";
 import useCartStore from "../../store/cartStore";
 
 const ProductCard = ({ product }) => {
-  const { cart, addToCart, updateCartItem, removeCartItem } = useCartStore();
-  const [quantity, setQuantity] = useState(0);
+  const {
+    cart,
+    addToCart,
+    addItemLocally,
+    updateCartItem,
+    updateItemLocally,
+    removeCartItem,
+    removeItemLocally,
+  } = useCartStore();
 
-  // 🧠 Sync quantity with cartStore
-  useEffect(() => {
-    const cartItem = cart.find(
-      (item) =>
-        item.productId?._id === product._id || item.productId === product._id
-    );
+  const cartItem = cart.find(
+    (item) =>
+      item.productId?._id === product._id || item.productId === product._id
+  );
 
-    setQuantity(cartItem ? cartItem.quantity : 0);
-  }, [cart, product._id]);
+  const quantity = cartItem ? cartItem.quantity : 0;
 
   const handleAddToCart = async () => {
     if (product.stock <= 0) return;
+
+    addItemLocally({
+      productId: product._id,
+      quantity: 1,
+      pricePerUnit: product.price,
+    });
+
     await addToCart({ productId: product._id, quantity: 1 });
   };
 
   const handleIncrease = async () => {
     if (quantity < product.stock) {
-      await updateCartItem({
-        productId: product._id,
-        quantity: quantity + 1,
-      });
+      updateItemLocally(product._id, quantity + 1);
+      await updateCartItem({ productId: product._id, quantity: quantity + 1 });
     }
   };
 
   const handleDecrease = async () => {
     if (quantity === 1) {
+      removeItemLocally(product._id);
       await removeCartItem(product._id);
     } else if (quantity > 1) {
-      await updateCartItem({
-        productId: product._id,
-        quantity: quantity - 1,
-      });
+      updateItemLocally(product._id, quantity - 1);
+      await updateCartItem({ productId: product._id, quantity: quantity - 1 });
     }
   };
 

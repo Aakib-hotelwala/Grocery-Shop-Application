@@ -4,11 +4,18 @@ import { get } from "../../services/endpoints";
 import API_ROUTES from "../../services/apiRoutes";
 import { useOutletContext } from "react-router-dom";
 import CategoryRow from "../../components/common/CategoryRow";
+import useCartStore from "../../store/cartStore";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
   const [groupedProducts, setGroupedProducts] = useState({});
   const { search } = useOutletContext();
+
+  const { fetchCart } = useCartStore();
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
   const groupByCategory = (products) => {
     return products.reduce((acc, product) => {
