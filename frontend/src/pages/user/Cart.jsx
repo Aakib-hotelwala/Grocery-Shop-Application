@@ -60,7 +60,16 @@ const Cart = () => {
   }
 
   return (
-    <Box px={{ xs: 1, sm: 4 }} py={4} maxWidth="1000px" mx="auto">
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"
+      overflow="hidden"
+      px={{ xs: 1, sm: 3 }}
+      py={4}
+      maxWidth="1000px"
+      mx="auto"
+    >
       <Typography variant="h5" fontWeight={600} mb={3}>
         🛒 Shopping Cart
       </Typography>
@@ -71,8 +80,15 @@ const Cart = () => {
         </Typography>
       ) : (
         <>
-          <TableContainer component={Paper}>
-            <Table>
+          <TableContainer
+            component={Paper}
+            sx={{
+              overflowX: "auto",
+              maxHeight: { xs: 360, sm: "none" },
+              "& table": { minWidth: 600 },
+            }}
+          >
+            <Table stickyHeader>
               <TableHead>
                 <TableRow>
                   <TableCell>Product</TableCell>
@@ -103,7 +119,15 @@ const Cart = () => {
                             }}
                           />
                           <Stack spacing={0.5}>
-                            <Typography fontWeight={500}>
+                            <Typography
+                              fontWeight={500}
+                              noWrap
+                              sx={{
+                                maxWidth: { xs: 120, sm: 160 },
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
                               {product.name}
                             </Typography>
                             <Typography
@@ -137,7 +161,7 @@ const Cart = () => {
                           <IconButton
                             size="small"
                             onClick={() => handleQuantityChange(item, 1)}
-                            disabled={item.quantity >= product.stock} // 👈 prevent exceeding stock
+                            disabled={item.quantity >= product.stock}
                           >
                             <AddIcon fontSize="small" />
                           </IconButton>
@@ -173,20 +197,25 @@ const Cart = () => {
               Total: ₹{totalAmount}
             </Typography>
 
-            <Stack direction="row" spacing={2} flexWrap="wrap">
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              width={{ xs: "100%", sm: "auto" }}
+            >
               <Button
                 variant="outlined"
                 color="error"
                 onClick={clearCart}
-                fullWidth={isMobile}
+                fullWidth
               >
                 Clear Cart
               </Button>
               <Button
                 variant="contained"
                 color="primary"
+                sx={{ color: "#fff" }}
                 onClick={() => alert("Proceed to checkout")}
-                fullWidth={isMobile}
+                fullWidth
               >
                 Checkout
               </Button>
