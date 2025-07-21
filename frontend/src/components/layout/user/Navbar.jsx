@@ -248,6 +248,9 @@ const Navbar = ({ search, setSearch }) => {
             <ListItem button onClick={() => navigate("/user/profile")}>
               <ListItemText primary="Profile" />
             </ListItem>
+            <ListItem button onClick={() => navigate("/user/orders")}>
+              <ListItemText primary="My Orders" />
+            </ListItem>
             <ListItem button onClick={toggleTheme}>
               <ListItemText
                 primary={mode === "light" ? "Dark Mode" : "Light Mode"}

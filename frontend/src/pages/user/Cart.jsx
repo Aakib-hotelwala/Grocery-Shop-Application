@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -15,11 +15,16 @@ import {
   Stack,
   useMediaQuery,
   useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+
 import useCartStore from "../../store/cartStore";
+import { post } from "../../services/endpoints";
+import API_ROUTES from "../../services/apiRoutes";
 
 const Cart = () => {
   const {
@@ -35,12 +40,18 @@ const Cart = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   useEffect(() => {
     fetchCart();
   }, []);
 
-  const handleQuantityChange = async (item, change) => {
+  const handleQuantityChange = (item, change) => {
     const newQty = item.quantity + change;
     const productId = item.productId._id;
 
@@ -50,6 +61,36 @@ const Cart = () => {
     } else {
       updateItemLocally(productId, newQty);
       updateCartItem({ productId, quantity: newQty });
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      setPlacingOrder(true);
+      const orderData = {
+        items: cart.map((item) => ({
+          productId: item.productId._id,
+          quantity: item.quantity,
+        })),
+        totalAmount: totalAmount,
+      };
+
+      const res = await post(API_ROUTES.PLACE_ORDER, orderData);
+      setSnackbar({
+        open: true,
+        message: "✅ Order placed successfully!",
+        severity: "success",
+      });
+      clearCart();
+    } catch (error) {
+      console.error("Order error:", error);
+      setSnackbar({
+        open: true,
+        message: "❌ Failed to place order",
+        severity: "error",
+      });
+    } finally {
+      setPlacingOrder(false);
     }
   };
 
@@ -221,15 +262,31 @@ const Cart = () => {
                 variant="contained"
                 color="primary"
                 sx={{ color: "#fff" }}
-                onClick={() => alert("Proceed to checkout")}
+                onClick={handleCheckout}
+                disabled={placingOrder}
                 fullWidth
               >
-                Checkout
+                {placingOrder ? "Placing Order..." : "Checkout"}
               </Button>
             </Stack>
           </Box>
         </>
       )}
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
